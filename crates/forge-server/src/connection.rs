@@ -42,7 +42,7 @@ impl Connection {
         })?;
 
         request.set_params(route.params);
-        let response: Response = (route.value)(request).await?;
+        let response: Response = (route.value)(request).await;
         response.send(&mut self.stream).await?;
 
         debug!("Request finished successfully");

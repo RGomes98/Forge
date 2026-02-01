@@ -2,9 +2,9 @@
 macro_rules! route {
     ($router:ident, $method:expr, $path:literal, $handler:expr) => {{
         #[allow(unused_imports)]
-        use $crate::{AsyncResolver, SyncResolver};
+        use $crate::{AsyncResolver, IntoResponse, SyncResolver};
 
-        fn wrapper<'a>(req: $crate::Request<'a>) -> $crate::HandlerResult<'a> {
+        fn wrapper<'a>(req: $crate::Request<'a>) -> $crate::Result<'a> {
             Box::pin(async move { $crate::OutputWrapper(Some($handler(req))).resolve().await })
         }
 

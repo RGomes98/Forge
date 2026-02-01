@@ -10,3 +10,4 @@ members = ["crates/forge"]
 [dependencies]
 forge = { path = "crates/forge" }
 tokio = { version = "1", features = ["full"] }
+serde_json = "1.0.149"

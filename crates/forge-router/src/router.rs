@@ -87,10 +87,10 @@ impl Router {
 mod tests {
     use super::*;
     use crate::get;
-    use forge_http::{HttpError, HttpStatus, Request, Response};
+    use forge_http::{HttpStatus, Request, Response};
 
-    fn dummy_handler(_: Request) -> Result<Response, HttpError> {
-        Ok(Response::new(HttpStatus::Ok))
+    fn dummy_handler(_: Request) -> Response {
+        Response::new(HttpStatus::Ok)
     }
 
     #[test]
