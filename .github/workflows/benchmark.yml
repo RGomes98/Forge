@@ -76,6 +76,7 @@ jobs:
 
       - name: Start Server
         run: |
+          ulimit -n 65535
           nohup ./target/release/forge-example &
           echo $! > server_pid.txt
 
