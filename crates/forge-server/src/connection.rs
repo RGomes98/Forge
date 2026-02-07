@@ -1,5 +1,5 @@
 use std::io::Error;
-use std::str::Utf8Error;
+use std::str::{self, Utf8Error};
 use std::sync::Arc;
 use std::{io::ErrorKind, net::SocketAddr};
 
@@ -7,11 +7,8 @@ use super::ListenerError;
 use forge_http::{HttpError, HttpStatus, Request, Response};
 use forge_router::{Handler, Router};
 use forge_utils::PathMatch;
-use tokio::io::AsyncReadExt;
-use tokio::net::TcpStream;
+use monoio::{io::AsyncReadRent, net::TcpStream};
 use tracing::{debug, warn};
-
-const BUFFER_SIZE: usize = 4096;
 
 pub struct Connection {
     pub router: Arc<Router>,
@@ -19,12 +16,11 @@ pub struct Connection {
 }
 
 impl Connection {
-    pub async fn process_request(&mut self) -> Result<(), ListenerError> {
+    pub async fn process_request(&mut self, buffer: Vec<u8>) -> Result<Vec<u8>, ListenerError> {
         let peer_addr: Option<SocketAddr> = self.stream.peer_addr().ok();
         debug!("Processing connection from: {peer_addr:?}");
 
-        let mut buffer: [u8; BUFFER_SIZE] = [0; BUFFER_SIZE]; // TODO: Dynamic Buffer
-        let bytes_read: usize = self.read_request_bytes(&mut buffer).await?;
+        let (bytes_read, buffer): (usize, Vec<u8>) = self.read_request_bytes(buffer).await?;
         let raw_bytes: &[u8] = &buffer[..bytes_read];
 
         let raw_request: &str = str::from_utf8(raw_bytes).map_err(|e: Utf8Error| {
@@ -46,11 +42,13 @@ impl Connection {
         response.send(&mut self.stream).await?;
 
         debug!("Request finished successfully");
-        Ok(())
+        Ok(buffer)
     }
 
-    async fn read_request_bytes(&mut self, buffer: &mut [u8]) -> Result<usize, ListenerError> {
-        let bytes: usize = self.stream.read(buffer).await.map_err(|e: Error| match e.kind() {
+    async fn read_request_bytes(&mut self, buffer: Vec<u8>) -> Result<(usize, Vec<u8>), ListenerError> {
+        let (read_result, buffer): (Result<usize, Error>, Vec<u8>) = self.stream.read(buffer).await;
+
+        let bytes: usize = read_result.map_err(|e: Error| match e.kind() {
             ErrorKind::ConnectionReset | ErrorKind::BrokenPipe => ListenerError::ConnectionClosed,
             _ => HttpError::new(HttpStatus::InternalServerError, "Failed to read data from stream").into(),
         })?;
@@ -59,6 +57,6 @@ impl Connection {
             return Err(ListenerError::ConnectionClosed);
         }
 
-        Ok(bytes)
+        Ok((bytes, buffer))
     }
 }

@@ -14,6 +14,7 @@ use monoio::{FusionDriver, FusionRuntime, IoUringDriver, LegacyDriver, RuntimeBu
 use tracing::{error, info, warn};
 
 const DEFAULT_RING_ENTRIES: u32 = 4096;
+const BUFFER_SIZE: usize = 4096;
 
 pub struct ListenerOptions {
     pub port: u16,
@@ -119,17 +120,20 @@ impl Listener {
 
     async fn handle_connection(stream: TcpStream, router: Arc<Router>) {
         let mut connection: Connection = Connection { router, stream };
+        let mut buffer: Vec<u8> = vec![0; BUFFER_SIZE];
 
         loop {
-            if let Err(e) = connection.process_request().await {
-                match e {
+            match connection.process_request(buffer).await {
+                Ok(connection_buffer) => {
+                    buffer = connection_buffer;
+                }
+                Err(e) => match e {
                     ListenerError::ConnectionClosed => break,
                     ListenerError::Http(e) => {
-                        if (Response::new(e.status).send(&mut connection.stream).await).is_err() {
-                            break;
-                        }
+                        Response::new(e.status).send(&mut connection.stream).await.ok();
+                        break;
                     }
-                }
+                },
             }
         }
     }
