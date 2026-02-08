@@ -4,13 +4,14 @@ use forge::prelude::*;
 use serde_json::json;
 use tokio::time::sleep;
 
-#[forge::prelude::main]
+#[monoio::main]
 async fn main() {
     let mut router: Router = Router::new();
 
-    let config: ListenerOptions = ListenerOptions {
-        port: Config::from_env("PORT").unwrap_or(3000),
+    let options: ListenerOptions = ListenerOptions {
         host: Config::from_env("HOST").unwrap_or_else(|_| Ipv4Addr::new(127, 0, 0, 1)),
+        threads: Config::from_env("THREADS").unwrap_or(0),
+        port: Config::from_env("PORT").unwrap_or(3000),
     };
 
     routes!(router, {
@@ -21,9 +22,7 @@ async fn main() {
 
     get!(router, "/store/:store_id/customer/:customer_id", store_handler);
 
-    if let Err(e) = Listener::new(router, config).with_default_logger().run().await {
-        eprintln!("Failed to initialize server {e}")
-    };
+    Listener::new(router, options).with_default_logger().run();
 }
 
 async fn user_handler(_: Request<'_>) -> Response<'_> {
