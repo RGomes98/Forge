@@ -86,7 +86,11 @@ fn extract_arc_inner_ty(ty: &syn::Type) -> Result<syn::Type> {
         return Err(Error::new(ty.span(), "Arc must be Arc<T>"));
     }
 
-    let arg: &syn::GenericArgument = ab.args.first().unwrap();
+    let arg: &syn::GenericArgument = match ab.args.first() {
+        Some(arg) => arg,
+        None => return Err(Error::new(ab.span(), "Arc must be Arc<T>")),
+    };
+
     let syn::GenericArgument::Type(inner_ty) = arg else {
         return Err(Error::new(arg.span(), "Arc must be Arc<T> (type argument)"));
     };
@@ -160,7 +164,16 @@ pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
     } else {
-        let second_arg_ty: &syn::Type = match func.sig.inputs.iter().nth(1).unwrap() {
+        let second_arg: &syn::FnArg = match func.sig.inputs.iter().nth(1) {
+            Some(arg) => arg,
+            None => {
+                return Error::new(func.sig.inputs.span(), "#[route] Handler must take (Request, Arc<T>)")
+                    .to_compile_error()
+                    .into();
+            }
+        };
+
+        let second_arg_ty: &syn::Type = match second_arg {
             syn::FnArg::Typed(pat_ty) => &pat_ty.ty,
             syn::FnArg::Receiver(r) => {
                 return Error::new(r.span(), "#[route] Cannot be used on methods (no self)")
