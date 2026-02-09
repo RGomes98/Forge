@@ -2,7 +2,7 @@ use super::HttpStatus;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-#[error("[{}] {}: {}", self.status as u16, status, message)]
+#[error("[{}] {}: {}", u16::from(self.status), status, message)]
 pub struct HttpError {
     pub status: HttpStatus,
     pub message: String,

@@ -4,7 +4,7 @@ use super::{HttpError, HttpStatus};
 use monoio::{io::AsyncWriteRent, io::AsyncWriteRentExt, net::TcpStream};
 use serde::Serialize;
 
-const BUFFER_SIZE: usize = 1024;
+const EXPECTED_BUFFER_SIZE: usize = 1024;
 
 pub struct Response<'a> {
     status: HttpStatus,
@@ -59,7 +59,7 @@ impl<'a> Response<'a> {
         }
     }
 
-    fn write_head_to_vec(&self, buffer: &mut Vec<u8>) -> Result<(), HttpError> {
+    fn write_head_to_buffer(&self, buffer: &mut Vec<u8>) -> Result<(), HttpError> {
         write!(buffer, "HTTP/1.1 {} {}\r\n", u16::from(self.status), self.status)
             .map_err(|_| HttpError::new(HttpStatus::InternalServerError, "Headers too long for buffer"))?;
 
@@ -78,15 +78,15 @@ impl<'a> Response<'a> {
     pub async fn send(self, stream: &mut TcpStream) -> Result<(), HttpError> {
         let content_length: usize = self.body.as_ref().map(|b: &Cow<str>| b.len()).unwrap_or(0);
 
-        let mut payload: Vec<u8> = Vec::with_capacity(BUFFER_SIZE + content_length);
-        self.write_head_to_vec(&mut payload)?;
+        let mut buffer: Vec<u8> = Vec::with_capacity(EXPECTED_BUFFER_SIZE + content_length);
+        self.write_head_to_buffer(&mut buffer)?;
 
         if let Some(body) = &self.body {
-            payload.extend_from_slice(body.as_bytes());
+            buffer.extend_from_slice(body.as_bytes());
         }
 
         stream
-            .write_all(payload)
+            .write_all(buffer)
             .await
             .0
             .map_err(|_| HttpError::new(HttpStatus::InternalServerError, "Failed to write response"))?;
