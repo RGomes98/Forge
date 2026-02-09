@@ -4,6 +4,6 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum RouterError {
-    #[error("Route already exists: {0}")]
+    #[error("{0}: duplicate route")]
     DuplicateRoute(String),
 }

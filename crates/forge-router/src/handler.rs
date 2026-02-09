@@ -1,60 +1,45 @@
-use std::{future, pin::Pin};
+use std::{future::Future, pin::Pin, sync::Arc};
 
-use forge_http::{Request, Response, response::IntoResponse};
+use forge_http::{Request, Response};
 
-pub type Result<'a> = Pin<Box<dyn Future<Output = Response<'a>> + Send + 'a>>;
-pub type Handler = Box<dyn for<'a> Fn(Request<'a>) -> Result<'a> + Send + Sync>;
+pub type LocalBoxFuture<'a, T> = Pin<Box<dyn Future<Output = T> + 'a>>;
+pub type BoxedHandler<T> = Box<dyn Handler<T>>;
 
-pub struct OutputWrapper<T>(pub Option<T>);
-
-pub trait IntoHandler: Send + Sync + 'static {
-    fn into_handler(self) -> Handler;
+pub trait IntoHandler<T>: Send + Sync + 'static {
+    fn into_handler(self) -> BoxedHandler<T>;
 }
 
-impl<T> IntoHandler for T
+pub struct HandlerFn<T>(pub T);
+
+pub trait Handler<T>: Send + Sync + 'static {
+    fn call<'a>(&'a self, req: Request<'a>, state: Option<Arc<T>>) -> LocalBoxFuture<'a, Response<'a>>;
+}
+
+impl<T, K> Handler<K> for HandlerFn<T>
 where
-    T: for<'a> Fn(Request<'a>) -> Result<'a> + Send + Sync + 'static,
+    K: Send + Sync + 'static,
+    T: for<'r> Fn(Request<'r>, Option<Arc<K>>) -> LocalBoxFuture<'r, Response<'r>> + Send + Sync + 'static,
 {
-    fn into_handler(self) -> Handler {
-        Box::new(self)
+    fn call<'a>(&'a self, req: Request<'a>, state: Option<Arc<K>>) -> LocalBoxFuture<'a, Response<'a>> {
+        (self.0)(req, state)
     }
 }
 
-pub trait AsyncResolver<'a> {
-    type Output: Future<Output = Response<'a>> + Send;
-    fn resolve(self) -> Self::Output;
-}
-
-impl<'a, T, K> AsyncResolver<'a> for OutputWrapper<K>
+impl<T, K> IntoHandler<K> for T
 where
-    K: Future<Output = T> + Send + 'a,
-    T: IntoResponse<'a>,
+    K: Send + Sync + 'static,
+    T: for<'a> Fn(Request<'a>, Option<Arc<K>>) -> LocalBoxFuture<'a, Response<'a>> + Send + Sync + 'static,
 {
-    type Output = Pin<Box<dyn Future<Output = Response<'a>> + Send + 'a>>;
-
-    fn resolve(mut self) -> Self::Output {
-        let output: K = self.0.take().expect("\"AsyncResolver\" initialized without value");
-
-        Box::pin(async move {
-            let result: T = output.await;
-            result.into_response()
-        })
+    fn into_handler(self) -> BoxedHandler<K> {
+        Box::new(HandlerFn(self))
     }
 }
 
-pub trait SyncResolver<'a> {
-    type Output: Future<Output = Response<'a>> + Send;
-    fn resolve(self) -> Self::Output;
-}
-
-impl<'a, T> SyncResolver<'a> for OutputWrapper<T>
+impl<T> IntoHandler<T> for BoxedHandler<T>
 where
-    T: IntoResponse<'a> + Send + 'a,
+    T: Send + Sync + 'static,
 {
-    type Output = Pin<Box<dyn Future<Output = Response<'a>> + Send + 'a>>;
-
-    fn resolve(self) -> Self::Output {
-        let output: T = self.0.expect("Value of \"SyncResolver\" consumed twice");
-        Box::pin(future::ready(output.into_response()))
+    fn into_handler(self) -> BoxedHandler<T> {
+        self
     }
 }
