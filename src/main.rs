@@ -22,10 +22,13 @@ async fn main() {
     router.register(health_handler());
     router.register(version_handler());
 
-    Listener::new(router, options)
+    if let Err(e) = Listener::new(router, options)
         .with_default_logger()
         .with_state(VERSION)
-        .run();
+        .run()
+    {
+        eprintln!("failed to initialize server {e}")
+    }
 }
 
 #[forge::get("/ping")]

@@ -1,3 +1,4 @@
+use std::io::Error;
 use std::net::{Ipv4Addr, SocketAddr};
 use std::num::NonZero;
 use std::sync::Arc;
@@ -53,8 +54,8 @@ where
         self
     }
 
-    pub fn run(self) {
-        let address: SocketAddr = SocketAddr::from((self.options.host, self.options.port));
+    pub fn run(self) -> Result<(), ListenerError> {
+        let addr: SocketAddr = SocketAddr::from((self.options.host, self.options.port));
 
         let threads: usize = self.options.threads.filter(|&n: &usize| n >= 1).unwrap_or_else(|| {
             thread::available_parallelism()
@@ -62,39 +63,28 @@ where
                 .unwrap_or(1)
         });
 
-        info!(threads, "Listener running on http://{address}");
+        info!(threads, "Listener running on http://{addr}");
 
-        let handles: Vec<JoinHandle<()>> = (0..threads)
+        let handles: Vec<JoinHandle<Result<(), ListenerError>>> = (0..threads)
             .map(|i: usize| {
                 let shared_router: Arc<Router<T>> = self.router.clone();
                 let shared_state: Option<Arc<T>> = self.state.clone();
 
-                thread::spawn(move || {
+                thread::spawn(move || -> Result<(), ListenerError> {
                     let mut runtime: FusionRuntime<TimeDriver<IoUringDriver>, TimeDriver<LegacyDriver>> =
-                        match RuntimeBuilder::<FusionDriver>::new()
+                        RuntimeBuilder::<FusionDriver>::new()
                             .enable_all()
                             .with_entries(DEFAULT_RING_ENTRIES)
                             .build()
-                        {
-                            Ok(runtime) => runtime,
-                            Err(e) => {
-                                error!("Failed to build Monoio runtime for thread {i}: {e}");
-                                return;
-                            }
-                        };
+                            .map_err(|e: Error| ListenerError::Runtime(i, e))?;
 
                     runtime.block_on(async {
-                        let listener: TcpListener = match TcpListener::bind(address) {
-                            Ok(listener) => listener,
-                            Err(e) => {
-                                error!("Bind error on thread {i}: {e}");
-                                return;
-                            }
-                        };
+                        let listener: TcpListener =
+                            TcpListener::bind(addr).map_err(|e: Error| ListenerError::Bind(addr, i, e))?;
 
                         loop {
                             match listener.accept().await {
-                                Ok((stream, _address)) => {
+                                Ok((stream, _)) => {
                                     let thread_router: Arc<Router<T>> = shared_router.clone();
                                     let thread_state: Option<Arc<T>> = shared_state.clone();
 
@@ -111,16 +101,26 @@ where
                                 }
                             }
                         }
-                    });
+
+                        #[allow(unreachable_code)]
+                        Ok::<(), ListenerError>(())
+                    })
                 })
             })
             .collect();
 
         for (i, handler) in handles.into_iter().enumerate() {
-            if let Err(e) = handler.join() {
-                error!("Thread {i} failed to join: {e:?}");
+            match handler.join() {
+                Ok(Ok(())) => {}
+                Ok(Err(e)) => return Err(e),
+                Err(e) => {
+                    let msg: &str = e.downcast_ref::<&'static str>().copied().unwrap_or("unknown cause");
+                    return Err(ListenerError::ThreadPanic(i, msg.into()));
+                }
             }
         }
+
+        Ok(())
     }
 
     async fn handle_connection(stream: TcpStream, router: Arc<Router<T>>, state: Option<Arc<T>>) {
@@ -130,13 +130,12 @@ where
         loop {
             match connection.process_request(buffer).await {
                 Ok(connection_buffer) => buffer = connection_buffer,
-                Err(e) => match e {
-                    ListenerError::ConnectionClosed => break,
-                    ListenerError::Http(e) => {
-                        Response::new(e.status).send(&mut connection.stream).await.ok();
-                        break;
-                    }
-                },
+                Err(ListenerError::ConnectionClosed) => break,
+                Err(ListenerError::Http(e)) => {
+                    Response::new(e.status).send(&mut connection.stream).await.ok();
+                    break;
+                }
+                Err(_) => unreachable!(),
             }
         }
     }
