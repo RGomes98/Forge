@@ -1,6 +1,6 @@
 # Forge
 
-Forge is a lightweight HTTP framework built in Rust using Tokio.
+Forge is a lightweight HTTP framework built in Rust using Monoio.
 
 ## Getting Started
 
@@ -43,6 +43,7 @@ cd Forge
 
 ```toml
 [env]
+THREADS="0"
 PORT="8080"
 HOST="0.0.0.0"
 RUST_LOG="debug"
