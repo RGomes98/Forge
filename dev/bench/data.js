@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1769948408496,
+  "lastUpdate": 1770695272386,
   "repoUrl": "https://github.com/RGomes98/Forge",
   "entries": {
     "Benchmark": [
@@ -260,6 +260,35 @@ window.BENCHMARK_DATA = {
           {
             "name": "API Throughput",
             "value": 150808.45,
+            "unit": "req/s"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "54034976+RGomes98@users.noreply.github.com",
+            "name": "Renan Tavares",
+            "username": "RGomes98"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "16fc59264ff28c8ea7c7cada9ba57aa86d65700a",
+          "message": "Merge pull request #21 from RGomes98/spike/monoio-migration\n\nMonoio Migration",
+          "timestamp": "2026-02-10T00:46:51-03:00",
+          "tree_id": "9523ea2393c02f7b1299714773a2ada66b3e3ed2",
+          "url": "https://github.com/RGomes98/Forge/commit/16fc59264ff28c8ea7c7cada9ba57aa86d65700a"
+        },
+        "date": 1770695271439,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "API Throughput",
+            "value": 150154.08,
             "unit": "req/s"
           }
         ]
