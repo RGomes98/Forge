@@ -6,8 +6,6 @@ use super::HttpError;
 use super::HttpMethod;
 use super::HttpStatus;
 
-use tracing::{debug, trace, warn};
-
 type RequestLine<'a> = (&'a str, &'a str, HttpMethod);
 pub type Headers<'a> = HashMap<Cow<'a, str>, Cow<'a, str>>;
 pub type Params<'a> = HashMap<&'a str, &'a str>;
@@ -25,19 +23,14 @@ pub struct Request<'a> {
 
 impl<'a> Request<'a> {
     pub fn new(raw_request: &'a str) -> Result<Self, HttpError> {
-        trace!("Starting request parsing");
         let mut lines: Lines = raw_request.lines();
 
-        let request_lines: &str = lines.next().ok_or_else(|| {
-            warn!("Received empty request line");
-            HttpError::new(HttpStatus::BadRequest, "Request line is empty or missing")
-        })?;
+        let request_lines: &str = lines
+            .next()
+            .ok_or_else(|| HttpError::new(HttpStatus::BadRequest, "Request line is empty or missing"))?;
 
         let (path, version, method): RequestLine = Self::parse_request_line(request_lines)?;
-        debug!("Parsed request line: {method} {path} {version}");
-
         let headers: Headers = Self::parse_headers(lines)?;
-        trace!("Parsed {} headers", headers.len());
 
         Ok(Self {
             headers,
@@ -57,7 +50,6 @@ impl<'a> Request<'a> {
             .take_while(|line: &&str| !line.trim().is_empty())
             .map(|header: &str| {
                 let values: (&str, &str) = header.split_once(HEADERS_SEPARATOR).ok_or_else(|| {
-                    warn!("Malformed header found: '{header}'");
                     HttpError::new(HttpStatus::BadRequest, format!("Invalid header format: \"{header}\""))
                 })?;
 
@@ -78,25 +70,19 @@ impl<'a> Request<'a> {
     fn parse_request_line(raw_request_line: &str) -> Result<RequestLine<'_>, HttpError> {
         let mut parts: SplitWhitespace = raw_request_line.split_whitespace();
 
-        let method_str: &str = parts.next().ok_or_else(|| {
-            warn!("Missing HTTP Method in request line");
-            HttpError::new(HttpStatus::BadRequest, "Request line missing HTTP Method")
-        })?;
+        let method_str: &str = parts
+            .next()
+            .ok_or_else(|| HttpError::new(HttpStatus::BadRequest, "Request line missing HTTP Method"))?;
 
-        let path: &str = parts.next().ok_or_else(|| {
-            warn!("Missing URI Path in request line");
-            HttpError::new(HttpStatus::BadRequest, "Request line missing URI Path")
-        })?;
+        let path: &str = parts
+            .next()
+            .ok_or_else(|| HttpError::new(HttpStatus::BadRequest, "Request line missing URI Path"))?;
 
-        let version: &str = parts.next().ok_or_else(|| {
-            warn!("Missing HTTP Version in request line");
-            HttpError::new(HttpStatus::BadRequest, "Request line missing HTTP Version")
-        })?;
+        let version: &str = parts
+            .next()
+            .ok_or_else(|| HttpError::new(HttpStatus::BadRequest, "Request line missing HTTP Version"))?;
 
-        let method: HttpMethod = HttpMethod::from_str(method_str).inspect_err(|_| {
-            warn!("Invalid HTTP Method: '{method_str}'");
-        })?;
-
+        let method: HttpMethod = HttpMethod::from_str(method_str)?;
         Ok((path, version, method))
     }
 }

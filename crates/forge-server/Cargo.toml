@@ -7,7 +7,5 @@ edition = "2024"
 forge-http = { path = "../forge-http" }
 forge-router = { path = "../forge-router" }
 forge-utils = { path = "../forge-utils" }
-forge-logging = { path = "../forge-logging" }
 thiserror = "2.0.17"
 monoio = { version = "0.2.4" }
-tracing = { version = "=0.1.44" }
