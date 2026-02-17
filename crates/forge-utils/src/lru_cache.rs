@@ -2,6 +2,7 @@ use std::collections::{HashMap, VecDeque};
 use std::future::Future;
 use std::hash::Hash;
 
+#[derive(Debug)]
 pub struct LruCache<K, V> {
     capacity: usize,
     order: VecDeque<K>,
