@@ -60,15 +60,14 @@ impl<'a> Response<'a> {
     }
 
     fn write_head_to_buffer(&self, buffer: &mut Vec<u8>) -> Result<(), HttpError> {
-        write!(buffer, "HTTP/1.1 {} {}\r\n", u16::from(self.status), self.status)
-            .map_err(|_| HttpError::new(HttpStatus::InternalServerError, "Headers too long for buffer"))?;
+        write!(buffer, "HTTP/1.1 {} {}\r\n", u16::from(self.status), self.status)?;
 
         for (key, value) in &self.headers {
-            write!(buffer, "{key}: {value}\r\n")
-                .map_err(|_| HttpError::new(HttpStatus::InternalServerError, "Headers too long for buffer"))?;
+            write!(buffer, "{key}: {value}\r\n")?;
         }
 
         let content_length: usize = self.body.as_ref().map(|b: &Cow<str>| b.len()).unwrap_or(0);
+
         write!(buffer, "Content-Length: {content_length}\r\n\r\n")
             .map_err(|_| HttpError::new(HttpStatus::InternalServerError, "Headers too long for buffer"))?;
 

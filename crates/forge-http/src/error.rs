@@ -1,3 +1,5 @@
+use std::io::Error;
+
 use super::HttpStatus;
 use thiserror::Error;
 
@@ -14,5 +16,11 @@ impl HttpError {
             status,
             message: msg.into(),
         }
+    }
+}
+
+impl From<Error> for HttpError {
+    fn from(e: Error) -> Self {
+        HttpError::new(HttpStatus::InternalServerError, e.to_string())
     }
 }

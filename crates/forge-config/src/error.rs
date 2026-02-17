@@ -1,3 +1,4 @@
+use std::env::VarError;
 use std::fmt::Debug;
 use std::io;
 
@@ -5,8 +6,8 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ConfigError {
-    #[error("Environment variable '{0}' is missing or invalid")]
-    MissingOrInvalid(String),
+    #[error("Environment variable is missing or invalid: {0}")]
+    MissingOrInvalid(#[from] VarError),
 
     #[error("Failed to parse string value: {0}")]
     StringParse(#[source] Box<dyn std::error::Error>),

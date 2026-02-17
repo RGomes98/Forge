@@ -13,7 +13,7 @@ impl Config {
         T: FromStr,
         T::Err: std::error::Error + 'static,
     {
-        let value_str: String = env::var(key).map_err(|_| ConfigError::MissingOrInvalid(key.into()))?;
+        let value_str: String = env::var(key)?;
 
         let value: T = value_str
             .parse::<T>()
