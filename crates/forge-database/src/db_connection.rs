@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use super::RowSet;
-use super::actor::ActorMessage;
+use super::database::DbCommand;
 use super::error::DatabaseError;
 use super::sql_args::SqlArg;
 use forge_utils::LruCache;
@@ -13,18 +13,18 @@ use tokio_postgres::{Client, Connection, Error, NoTls, Socket, Statement};
 const LRU_CACHE_SIZE: usize = 256;
 
 #[derive(Debug)]
-pub struct Worker {
+pub struct DbConnection {
     client: Arc<Client>,
     semaphore: Arc<Semaphore>,
-    receiver: Receiver<ActorMessage>,
+    receiver: Receiver<DbCommand>,
     cache: LruCache<Arc<str>, Statement>,
 }
 
-impl Worker {
+impl DbConnection {
     pub async fn new(
         database_url: String,
         inflight_per_conn: usize,
-        receiver: Receiver<ActorMessage>,
+        receiver: Receiver<DbCommand>,
     ) -> Result<Self, DatabaseError> {
         let (client, connection): (Client, Connection<Socket, NoTlsStream>) =
             tokio_postgres::connect(&database_url, NoTls).await?;
@@ -43,7 +43,7 @@ impl Worker {
     }
 
     async fn prepare_statement(&mut self, query: Arc<str>) -> Result<Statement, DatabaseError> {
-        let client: Arc<Client> = self.client.clone();
+        let client: &Arc<Client> = &self.client;
 
         self.cache
             .get_or_fetch(query, move |key: &Arc<str>| {
@@ -54,18 +54,18 @@ impl Worker {
             .await
     }
 
-    pub async fn dispatch(&mut self) {
+    pub async fn process_queue(&mut self) {
         while let Some(message) = self.receiver.recv().await {
             let Ok(permit) = self.semaphore.clone().acquire_owned().await else {
                 break;
             };
 
             match message {
-                ActorMessage::Execute { query, args, sender } => {
+                DbCommand::Execute { query, args, reply } => {
                     let statement: Statement = match self.prepare_statement(query.clone()).await {
                         Ok(statement) => statement,
                         Err(e) => {
-                            sender.send(Err(e)).ok();
+                            reply.send(Err(e)).ok();
                             continue;
                         }
                     };
@@ -74,12 +74,12 @@ impl Worker {
                     tokio::spawn(async move {
                         let params: Vec<&(dyn ToSql + Sync)> = args.iter().map(|arg: &SqlArg| arg.as_sql()).collect();
 
-                        let result: Result<RowSet, DatabaseError> = match client.query(&statement, &params).await {
-                            Err(e) => Err(DatabaseError::Postgres(e)),
+                        let row_set: Result<RowSet, DatabaseError> = match client.query(&statement, &params).await {
                             Ok(rows) => Ok(RowSet::from_pg_rows(rows)),
+                            Err(e) => Err(DatabaseError::Postgres(e)),
                         };
 
-                        sender.send(result).ok();
+                        reply.send(row_set).ok();
                         drop(permit);
                     });
                 }
