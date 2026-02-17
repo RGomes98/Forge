@@ -1,5 +1,10 @@
 [env]
-THREADS="0"
-PORT="8080"
-HOST="0.0.0.0"
-RUST_LOG="debug"
+# Runtime configuration
+THREADS="0" # OS threads for the runtime (0 = auto-detect)
+PORT="8080" # Port to listen on
+HOST="0.0.0.0" # Host address (0.0.0.0 for all interfaces)
+
+# Database configuration
+DB_URL="postgresql://forge-example:forge-example@localhost:5432/forge-example" # PostgreSQL connection string (postgresql://user:password@host:port/dbname)
+DB_POOL_SIZE="8" # Number of concurrent database connections
+DB_INFLIGHT_PER_CONN="32" # Max pending queries per connection

@@ -36,17 +36,29 @@ git clone https://github.com/RGomes98/Forge.git
 cd Forge
 ```
 
+### Database Setup
+
+To quickly spin up a `PostgreSQL` instance with the correct credentials, use the provided `docker-compose` file:
+
+```bash
+docker compose up -d
+```
+
+> **This starts a PostgreSQL 16 instance using the default credentials from `config.toml`.**
+
 ### Configure environment variables
 
 1. Open the `config.toml` file located in the `./cargo` folder.
-2. Set the `PORT`, `HOST` and `RUST_LOG` variables according to your preferred configuration. By default, they are set to:
+2. Set the `THREADS`, `PORT`, `HOST`, `DB_URL`, `DB_POOL_SIZE` and `DB_INFLIGHT_PER_CONN` variables according to your preferred configuration. By default, they are set to:
 
 ```toml
 [env]
 THREADS="0"
 PORT="8080"
 HOST="0.0.0.0"
-RUST_LOG="debug"
+DB_URL="postgresql://forge-example:forge-example@localhost:5432/forge-example"
+DB_POOL_SIZE="8"
+DB_INFLIGHT_PER_CONN="32"
 ```
 
 ### Build and run the server
@@ -59,18 +71,26 @@ cargo run
 
 The server will start on the specified host and port (default: `http://0.0.0.0:8080`).
 
-### Build in Release (better performance)
+### Build and Run in Release Mode
 
-To run the server with optimizations enabled, build it in release mode:
+For maximum performance, use release mode. `cargo run` automatically injects variables from `.cargo/config.toml`:
+
+```bash
+cargo run --release
+```
+
+To run the binary independently, you must provide the environment variables manually as it will ignore the `.cargo/config.toml` file:
+
+> **Compiles the project in release mode.**
 
 ```bash
 cargo build --release
 ```
 
-Then run the generated binary:
+> **Example of passing custom environment variables directly to the binary.**
 
 ```bash
-./target/release/forge-example
+DB_URL="postgresql://user:pass@localhost:5432/db" ./target/release/forge-example
 ```
 
 ## Contributing
