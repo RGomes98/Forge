@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use serde_json::Value;
 use tokio_postgres::types::{self, ToSql};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum SqlArg {
     Null,
     Bool(bool),
