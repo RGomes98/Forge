@@ -4,7 +4,6 @@ use super::BoxedHandler;
 use super::RouterError;
 use forge_http::HttpMethod;
 use forge_utils::{PathMatch, PathTree, Segment};
-use tracing::{debug, trace};
 
 type Path = &'static str;
 type Routes<T> = HashMap<HttpMethod, PathTree<BoxedHandler<T>>>; // TODO: Add support to dynamic routes (wildcards)
@@ -41,11 +40,15 @@ where
     T: Send + Sync + 'static,
 {
     pub fn new() -> Self {
-        trace!("Initializing router");
         Self { routes: HashMap::new() }
     }
 
-    pub fn register(&mut self, routable: Routable<T>) {
+    pub fn register<F>(&mut self, routable: F)
+    where
+        F: FnOnce() -> Routable<T>,
+    {
+        let routable: Routable<T> = routable();
+
         self.add_route(Route {
             path: routable.path,
             method: routable.method,
@@ -59,7 +62,6 @@ where
         path: &'b str,
         method: &HttpMethod,
     ) -> Option<PathMatch<'a, 'b, BoxedHandler<T>>> {
-        trace!("Looking up route for {method} {path}");
         let path_tree: &PathTree<BoxedHandler<T>> = self.routes.get(method)?;
         path_tree.find(Self::sanitize_path(path))
     }
@@ -74,7 +76,6 @@ where
             return Err(RouterError::DuplicateRoute(Self::fmt_route(&route.method, route.path)));
         };
 
-        debug!("Registered route: {}", Self::fmt_route(&route.method, route.path));
         Ok(())
     }
 
@@ -118,7 +119,7 @@ mod tests {
             Response::new(HttpStatus::Ok)
         }
 
-        router.register(ping_handler());
+        router.register(ping_handler);
 
         let result: Route = router.get_route("/ping", &HttpMethod::GET);
         assert!(result.is_some());
@@ -136,7 +137,7 @@ mod tests {
             Response::new(HttpStatus::Ok)
         }
 
-        router.register(ping_handler());
+        router.register(ping_handler);
 
         let result: Route = router.get_route("/pong", &HttpMethod::GET);
         assert!(result.is_none());
@@ -151,7 +152,7 @@ mod tests {
             Response::new(HttpStatus::Ok)
         }
 
-        router.register(data_handler());
+        router.register(data_handler);
 
         let result_get: Route = router.get_route("/data", &HttpMethod::GET);
         assert!(result_get.is_some());
@@ -169,7 +170,7 @@ mod tests {
             Response::new(HttpStatus::Ok)
         }
 
-        router.register(users_handler());
+        router.register(users_handler);
 
         let result: Route = router.get_route("/users/123", &HttpMethod::GET);
         assert!(result.is_some());
@@ -188,7 +189,7 @@ mod tests {
             Response::new(HttpStatus::Ok)
         }
 
-        router.register(store_handler());
+        router.register(store_handler);
 
         let result: Route = router.get_route("/store/99/customer/500", &HttpMethod::GET);
         assert!(result.is_some());
@@ -209,7 +210,7 @@ mod tests {
             Response::new(HttpStatus::Ok)
         }
 
-        router.register(status_handler());
+        router.register(status_handler);
 
         let paths_to_test: Vec<&str> = vec![
             "/api/v1/status",
@@ -233,7 +234,7 @@ mod tests {
             Response::new(HttpStatus::Ok)
         }
 
-        router.register(deep_handler());
+        router.register(deep_handler);
 
         let result: Route = router.get_route("/a/b/c/d", &HttpMethod::GET);
         assert!(result.is_some());
@@ -251,7 +252,7 @@ mod tests {
             Response::new(HttpStatus::Ok)
         }
 
-        router.register(files_handler());
+        router.register(files_handler);
         let result: Route = router.get_route("/files/images/recent", &HttpMethod::GET);
 
         assert!(result.is_some());
@@ -271,8 +272,8 @@ mod tests {
             Response::new(HttpStatus::Ok)
         }
 
-        router.register(duplicate_handler());
-        router.register(duplicate_handler());
+        router.register(duplicate_handler);
+        router.register(duplicate_handler);
     }
 
     #[test]
@@ -289,8 +290,8 @@ mod tests {
             Response::new(HttpStatus::Ok)
         }
 
-        router.register(users_id_handler());
-        router.register(users_all_handler());
+        router.register(users_id_handler);
+        router.register(users_all_handler);
 
         let exact_match: Route = router.get_route("/users/all", &HttpMethod::GET);
         assert!(exact_match.is_some());
