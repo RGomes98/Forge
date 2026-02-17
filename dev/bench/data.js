@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770695272386,
+  "lastUpdate": 1771300414269,
   "repoUrl": "https://github.com/RGomes98/Forge",
   "entries": {
     "Benchmark": [
@@ -289,6 +289,35 @@ window.BENCHMARK_DATA = {
           {
             "name": "API Throughput",
             "value": 150154.08,
+            "unit": "req/s"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "54034976+RGomes98@users.noreply.github.com",
+            "name": "Renan Tavares",
+            "username": "RGomes98"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "90dcd3a7c813714de16893b730b8f84d4cd79f10",
+          "message": "Merge pull request #26 from RGomes98/feat/db-generic-executor\n\nImplementação de Executor SQL Genérico via Actor Model (Tokio-on-Monoio)",
+          "timestamp": "2026-02-17T00:52:26-03:00",
+          "tree_id": "a7d1d75a1db4534249d5f641c15580eeb66b1023",
+          "url": "https://github.com/RGomes98/Forge/commit/90dcd3a7c813714de16893b730b8f84d4cd79f10"
+        },
+        "date": 1771300413954,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "API Throughput",
+            "value": 145856.97,
             "unit": "req/s"
           }
         ]
