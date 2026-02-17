@@ -24,7 +24,7 @@ where
         let raw_bytes: &[u8] = &buffer[..bytes_read];
 
         let raw_request: &str = str::from_utf8(raw_bytes)
-            .map_err(|e: Utf8Error| HttpError::new(HttpStatus::BadRequest, format!("Invalid UTF-8 sequence: {e}")))?;
+            .map_err(|e: Utf8Error| HttpError::new(HttpStatus::BadRequest, format!("Invalid UTF-8 sequence: {e:?}")))?;
 
         let mut request: Request = Request::new(raw_request)?;
 

@@ -77,7 +77,7 @@ where
                                     let thread_state: Option<Arc<T>> = shared_state.clone();
 
                                     if let Err(e) = stream.set_nodelay(true) {
-                                        eprintln!("Failed to set 'TCP_NODELAY' on thread {idx}: {e}");
+                                        eprintln!("Failed to set 'TCP_NODELAY' on worker #{idx}: {e:?}");
                                     }
 
                                     monoio::spawn(async move {
@@ -85,7 +85,7 @@ where
                                     });
                                 }
                                 Err(e) => {
-                                    eprintln!("Failed to accept connection on thread {idx}: {e}");
+                                    eprintln!("Failed to accept connection on worker #{idx}: {e:?}");
                                 }
                             }
                         }
