@@ -60,12 +60,10 @@ impl<'a> Response<'a> {
     }
 
     fn write_head_to_buffer(&self, buffer: &mut Vec<u8>) -> Result<(), HttpError> {
-        write!(buffer, "HTTP/1.1 {} {}\r\n", u16::from(self.status), self.status)
-            .map_err(|_| HttpError::new(HttpStatus::InternalServerError, "Headers too long for buffer"))?;
+        write!(buffer, "HTTP/1.1 {} {}\r\n", u16::from(self.status), self.status)?;
 
         for (key, value) in &self.headers {
-            write!(buffer, "{key}: {value}\r\n")
-                .map_err(|_| HttpError::new(HttpStatus::InternalServerError, "Headers too long for buffer"))?;
+            write!(buffer, "{key}: {value}\r\n")?;
         }
 
         let content_length: usize = self.body.as_ref().map(|b: &Cow<str>| b.len()).unwrap_or(0);
@@ -77,8 +75,8 @@ impl<'a> Response<'a> {
 
     pub async fn send(self, stream: &mut TcpStream) -> Result<(), HttpError> {
         let content_length: usize = self.body.as_ref().map(|b: &Cow<str>| b.len()).unwrap_or(0);
-
         let mut buffer: Vec<u8> = Vec::with_capacity(EXPECTED_BUFFER_SIZE + content_length);
+
         self.write_head_to_buffer(&mut buffer)?;
 
         if let Some(body) = &self.body {

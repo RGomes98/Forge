@@ -6,12 +6,10 @@ use std::thread::{self, JoinHandle};
 
 use super::{Connection, ListenerError};
 use forge_http::Response;
-use forge_logging::init_logger;
 use forge_router::Router;
 use monoio::net::{TcpListener, TcpStream};
 use monoio::time::TimeDriver;
 use monoio::{FusionDriver, FusionRuntime, IoUringDriver, LegacyDriver, RuntimeBuilder};
-use tracing::{error, info, warn};
 
 const DEFAULT_RING_ENTRIES: u32 = 4096;
 const BUFFER_SIZE: usize = 4096;
@@ -45,15 +43,6 @@ where
         self
     }
 
-    pub fn with_default_logger(self) -> Self {
-        match init_logger() {
-            Ok(_) => info!("Default logger initialized successfully"),
-            Err(_) => warn!("Logger already initialized, using existing global subscriber"),
-        };
-
-        self
-    }
-
     pub fn run(self) -> Result<(), ListenerError> {
         let addr: SocketAddr = SocketAddr::from((self.options.host, self.options.port));
 
@@ -63,10 +52,9 @@ where
                 .unwrap_or(1)
         });
 
-        info!(threads, "Listener running on http://{addr}");
-
+        println!("Listener running on http://{addr}");
         let handles: Vec<JoinHandle<Result<(), ListenerError>>> = (0..threads)
-            .map(|i: usize| {
+            .map(|idx: usize| {
                 let shared_router: Arc<Router<T>> = self.router.clone();
                 let shared_state: Option<Arc<T>> = self.state.clone();
 
@@ -76,11 +64,11 @@ where
                             .enable_all()
                             .with_entries(DEFAULT_RING_ENTRIES)
                             .build()
-                            .map_err(|e: Error| ListenerError::Runtime(i, e))?;
+                            .map_err(|e: Error| ListenerError::Runtime(idx, e))?;
 
                     runtime.block_on(async {
                         let listener: TcpListener =
-                            TcpListener::bind(addr).map_err(|e: Error| ListenerError::Bind(addr, i, e))?;
+                            TcpListener::bind(addr).map_err(|e: Error| ListenerError::Bind(addr, idx, e))?;
 
                         loop {
                             match listener.accept().await {
@@ -89,7 +77,7 @@ where
                                     let thread_state: Option<Arc<T>> = shared_state.clone();
 
                                     if let Err(e) = stream.set_nodelay(true) {
-                                        warn!("Failed to set 'TCP_NODELAY' on thread {i}: {e}");
+                                        eprintln!("Failed to set 'TCP_NODELAY' on thread {idx}: {e}");
                                     }
 
                                     monoio::spawn(async move {
@@ -97,25 +85,25 @@ where
                                     });
                                 }
                                 Err(e) => {
-                                    error!("Failed to accept connection on thread {i}: {e}");
+                                    eprintln!("Failed to accept connection on thread {idx}: {e}");
                                 }
                             }
                         }
 
                         #[allow(unreachable_code)]
-                        Ok::<(), ListenerError>(())
+                        Ok(())
                     })
                 })
             })
             .collect();
 
-        for (i, handler) in handles.into_iter().enumerate() {
+        for (idx, handler) in handles.into_iter().enumerate() {
             match handler.join() {
                 Ok(Ok(())) => {}
                 Ok(Err(e)) => return Err(e),
                 Err(e) => {
                     let msg: &str = e.downcast_ref::<&'static str>().copied().unwrap_or("unknown cause");
-                    return Err(ListenerError::ThreadPanic(i, msg.into()));
+                    return Err(ListenerError::ThreadPanic(idx, msg.into()));
                 }
             }
         }

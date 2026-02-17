@@ -9,3 +9,4 @@ forge-router = { path = "../forge-router" }
 forge-server = { path = "../forge-server" }
 forge-config = { path = "../forge-config" }
 forge-macros = { path = "../forge-macros" }
+forge-database = { path = "../forge-database" }

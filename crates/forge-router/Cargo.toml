@@ -8,4 +8,3 @@ forge-http = { path = "../forge-http" }
 forge-utils = { path = "../forge-utils" }
 forge-macros = { path = "../forge-macros" }
 thiserror = "2.0.17"
-tracing = { version = "=0.1.44"}
