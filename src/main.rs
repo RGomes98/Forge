@@ -45,17 +45,17 @@ fn main() {
 }
 
 #[forge::get("/ping")]
-async fn ping(_req: Request<'_>) -> Response<'static> {
+async fn ping() -> Response<'static> {
     Response::new(HttpStatus::Ok).text("OK")
 }
 
 #[forge::get("/version")]
-async fn version(_req: Request<'_>, state: Arc<State>) -> Response<'static> {
+async fn version(state: Arc<State>) -> Response<'static> {
     Response::new(HttpStatus::Ok).text(state.version)
 }
 
 #[forge::get("/users")]
-async fn get_users(_req: Request<'_>, state: Arc<State>) -> Response<'static> {
+async fn get_users(state: Arc<State>) -> Response<'static> {
     match state.db.query("SELECT * FROM users", vec![]).await {
         Ok(users) => Response::new(HttpStatus::Ok).json(users.as_objects()),
         Err(e) => HttpError::new(HttpStatus::InternalServerError, e.to_string()).into(),
@@ -63,8 +63,8 @@ async fn get_users(_req: Request<'_>, state: Arc<State>) -> Response<'static> {
 }
 
 #[forge::post("/user/:username")]
-async fn create_user(req: Request<'_>, state: Arc<State>) -> Response<'static> {
-    let Some(username) = req.params.get("username") else {
+async fn create_user(request: Request<'_>, state: Arc<State>) -> Response<'static> {
+    let Some(username) = request.params.get("username") else {
         return HttpError::new(HttpStatus::BadRequest, "missing parameter \"username\"").into();
     };
 
@@ -78,7 +78,7 @@ async fn create_user(req: Request<'_>, state: Arc<State>) -> Response<'static> {
 }
 
 #[forge::post("/reset")]
-async fn reset_database(_req: Request<'_>, state: Arc<State>) -> Response<'static> {
+async fn reset_database(state: Arc<State>) -> Response<'static> {
     if let Err(e) = state.db.query("DROP TABLE IF EXISTS users", vec![]).await {
         return HttpError::new(HttpStatus::InternalServerError, e.to_string()).into();
     }
@@ -98,7 +98,7 @@ async fn reset_database(_req: Request<'_>, state: Arc<State>) -> Response<'stati
 }
 
 #[forge::post("/populate")]
-async fn populate_database(_req: Request<'_>, state: Arc<State>) -> Response<'static> {
+async fn populate_database(state: Arc<State>) -> Response<'static> {
     let sql: &str = "INSERT INTO users (username, active) VALUES ($1, $2), ($3, $4)";
 
     let args: Vec<SqlArg> = vec![
