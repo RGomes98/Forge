@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1771300414269,
+  "lastUpdate": 1771373976365,
   "repoUrl": "https://github.com/RGomes98/Forge",
   "entries": {
     "Benchmark": [
@@ -318,6 +318,35 @@ window.BENCHMARK_DATA = {
           {
             "name": "API Throughput",
             "value": 145856.97,
+            "unit": "req/s"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "54034976+RGomes98@users.noreply.github.com",
+            "name": "Renan Tavares",
+            "username": "RGomes98"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b928d3504794f0bb4ef488a27c7371c005c64981",
+          "message": "Merge pull request #27 from RGomes98/refactor/minor-adjustments\n\nDatabase driver naming and API semantic consistency",
+          "timestamp": "2026-02-17T21:18:39-03:00",
+          "tree_id": "5be0fc97c0fd4115f7ecb5f17cde588f4f3255c5",
+          "url": "https://github.com/RGomes98/Forge/commit/b928d3504794f0bb4ef488a27c7371c005c64981"
+        },
+        "date": 1771373975597,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "API Throughput",
+            "value": 148450.58,
             "unit": "req/s"
           }
         ]
