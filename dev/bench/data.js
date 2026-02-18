@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1771373976365,
+  "lastUpdate": 1771453722951,
   "repoUrl": "https://github.com/RGomes98/Forge",
   "entries": {
     "Benchmark": [
@@ -347,6 +347,35 @@ window.BENCHMARK_DATA = {
           {
             "name": "API Throughput",
             "value": 148450.58,
+            "unit": "req/s"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "54034976+RGomes98@users.noreply.github.com",
+            "name": "Renan Tavares",
+            "username": "RGomes98"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "458b0d9cfe0d5d8e8d75ba40c8c9226a2d1ac41d",
+          "message": "Merge pull request #28 from RGomes98/perf/minor-tweaks\n\nPerformance Tweaks",
+          "timestamp": "2026-02-18T19:27:15-03:00",
+          "tree_id": "56ffcbe68c5cdd1a75bf644368c0a0c7f1102c5a",
+          "url": "https://github.com/RGomes98/Forge/commit/458b0d9cfe0d5d8e8d75ba40c8c9226a2d1ac41d"
+        },
+        "date": 1771453722055,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "API Throughput",
+            "value": 154522.75,
             "unit": "req/s"
           }
         ]
