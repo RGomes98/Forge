@@ -8,4 +8,4 @@ forge-http = { path = "../forge-http" }
 forge-router = { path = "../forge-router" }
 forge-utils = { path = "../forge-utils" }
 thiserror = "2.0.17"
-monoio = { version = "0.2.4" }
+monoio = { version = "0.2.4", features = ["sync"] }

@@ -1,6 +1,6 @@
 use std::{fmt::Debug, io};
 
-use super::actor::ActorMessage;
+use super::database::DbCommand;
 use thiserror::Error;
 use tokio::sync::{mpsc::error::SendError, oneshot::error::RecvError};
 use tokio_postgres::error::DbError;
@@ -8,7 +8,7 @@ use tokio_postgres::error::DbError;
 #[derive(Error, Debug)]
 pub enum DatabaseError {
     #[error("database connection pool is closed or shutting down: {0}")]
-    PoolClosed(#[from] SendError<ActorMessage>),
+    PoolClosed(#[from] SendError<DbCommand>),
 
     #[error("database worker terminated without responding")]
     NoResponse(#[from] RecvError),

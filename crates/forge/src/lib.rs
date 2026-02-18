@@ -3,7 +3,7 @@ pub use forge_router;
 
 pub mod prelude {
     pub use forge_config::{Config, ConfigError};
-    pub use forge_database::{PgActor, PgOptions, SqlArg};
+    pub use forge_database::{Database, DatabaseError, DatabaseOptions, DbValue, RowSet, SqlArg};
     pub use forge_http::{Headers, HttpError, HttpStatus, Params, Request, Response};
     pub use forge_router::Router;
     pub use forge_server::{Listener, ListenerOptions};

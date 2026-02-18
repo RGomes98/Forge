@@ -53,7 +53,7 @@ impl<'a> Response<'a> {
             Ok(v) => self.header("Content-Type", "application/json").body(v),
             Err(e) => {
                 self.status = HttpStatus::InternalServerError;
-                self.body.replace(format!("JSON Serialization Failed: {e}").into());
+                self.body.replace(format!("JSON Serialization Failed: {e:?}").into());
                 self
             }
         }

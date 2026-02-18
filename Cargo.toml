@@ -9,4 +9,3 @@ members = ["crates/forge"]
 
 [dependencies]
 forge = { path = "crates/forge" }
-monoio = { version = "0.2.4", features = ["sync"] }

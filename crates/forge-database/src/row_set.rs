@@ -1,13 +1,13 @@
 use std::sync::Arc;
 
-use super::RowValue;
+use super::DbValue;
 use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
 use tokio_postgres::{Column, Row};
 
 #[derive(Debug)]
 pub struct RowSet {
     pub columns: Arc<[Arc<str>]>,
-    pub rows: Vec<Vec<RowValue>>,
+    pub rows: Vec<Vec<DbValue>>,
 }
 
 impl RowSet {
@@ -24,7 +24,7 @@ impl RowSet {
 
         Self {
             columns,
-            rows: rows.iter().map(RowValue::decode_row).collect(),
+            rows: rows.iter().map(DbValue::decode_row).collect(),
         }
     }
 
@@ -58,7 +58,7 @@ impl<'a> Serialize for RowSetAsObjects<'a> {
 #[derive(Debug)]
 struct RowAsObject<'a> {
     columns: &'a [Arc<str>],
-    row: &'a [RowValue],
+    row: &'a [DbValue],
 }
 
 impl<'a> Serialize for RowAsObject<'a> {

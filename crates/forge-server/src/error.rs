@@ -11,12 +11,12 @@ pub enum ListenerError {
     #[error("connection closed by peer")]
     ConnectionClosed,
 
-    #[error("failed to start runtime (thread {0}): {1}")]
+    #[error("failed to start runtime on worker #{0}: {1:?}")]
     Runtime(usize, io::Error),
 
-    #[error("bind failed on {0} (thread {1}): {2}")]
+    #[error("failed to bind listener to \"{0}\" on worker #{1}: {2:?}")]
     Bind(SocketAddr, usize, io::Error),
 
-    #[error("(thread {0}) panicked: {1}")]
+    #[error("worker #{0} panicked: {1}")]
     ThreadPanic(usize, String),
 }

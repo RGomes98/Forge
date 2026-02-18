@@ -1,8 +1,9 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDate, Utc};
 use serde_json::Value;
 use tokio_postgres::types::{self, ToSql};
+use uuid::Uuid;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum SqlArg {
     Null,
     Bool(bool),
@@ -12,6 +13,8 @@ pub enum SqlArg {
     Json(Value),
     Text(String),
     Timestamp(DateTime<Utc>),
+    Date(NaiveDate),
+    Uuid(Uuid),
 }
 
 impl SqlArg {
@@ -25,6 +28,8 @@ impl SqlArg {
             SqlArg::Json(v) => v,
             SqlArg::Binary(v) => v,
             SqlArg::Timestamp(v) => v,
+            SqlArg::Date(v) => v,
+            SqlArg::Uuid(v) => v,
         }
     }
 }
