@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1771453722951,
+  "lastUpdate": 1771458591911,
   "repoUrl": "https://github.com/RGomes98/Forge",
   "entries": {
     "Benchmark": [
@@ -376,6 +376,35 @@ window.BENCHMARK_DATA = {
           {
             "name": "API Throughput",
             "value": 154522.75,
+            "unit": "req/s"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "54034976+RGomes98@users.noreply.github.com",
+            "name": "Renan Tavares",
+            "username": "RGomes98"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "85c461ac2437722e59e85f04104f34dad7c27310",
+          "message": "Merge pull request #30 from RGomes98/feat/flexible-handlers\n\nFlexibilidade de Argumentos em Handlers via Macro",
+          "timestamp": "2026-02-18T20:48:53-03:00",
+          "tree_id": "bd8686f26f843c9a62eb56026b1498947215b906",
+          "url": "https://github.com/RGomes98/Forge/commit/85c461ac2437722e59e85f04104f34dad7c27310"
+        },
+        "date": 1771458591481,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "API Throughput",
+            "value": 152595.67,
             "unit": "req/s"
           }
         ]
