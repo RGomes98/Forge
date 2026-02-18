@@ -1,7 +1,7 @@
 use std::{borrow::Cow, io::Write};
 
 use super::{HttpError, HttpStatus};
-use monoio::{io::AsyncWriteRent, io::AsyncWriteRentExt, net::TcpStream};
+use monoio::{io::AsyncWriteRentExt, net::TcpStream};
 use serde::Serialize;
 
 const EXPECTED_BUFFER_SIZE: usize = 1024;
@@ -88,11 +88,6 @@ impl<'a> Response<'a> {
             .await
             .0
             .map_err(|_| HttpError::new(HttpStatus::InternalServerError, "Failed to write response"))?;
-
-        stream
-            .flush()
-            .await
-            .map_err(|_| HttpError::new(HttpStatus::InternalServerError, "Failed to flush stream"))?;
 
         Ok(())
     }

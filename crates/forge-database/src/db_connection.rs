@@ -55,12 +55,12 @@ impl DbConnection {
     }
 
     pub async fn process_queue(&mut self) {
-        while let Some(message) = self.receiver.recv().await {
+        while let Some(cmd) = self.receiver.recv().await {
             let Ok(permit) = self.semaphore.clone().acquire_owned().await else {
                 break;
             };
 
-            match message {
+            match cmd {
                 DbCommand::Execute { query, args, reply } => {
                     let statement: Statement = match self.prepare_statement(query.clone()).await {
                         Ok(statement) => statement,
