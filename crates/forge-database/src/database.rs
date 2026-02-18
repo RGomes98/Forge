@@ -1,3 +1,4 @@
+use std::sync::atomic::AtomicUsize;
 use std::sync::{Arc, atomic};
 use std::thread;
 
@@ -34,8 +35,8 @@ pub enum DbCommand {
 
 #[derive(Debug)]
 pub struct Database {
-    counter: Arc<atomic::AtomicUsize>,
-    senders: Arc<Vec<mpsc::Sender<DbCommand>>>,
+    counter: AtomicUsize,
+    senders: Vec<mpsc::Sender<DbCommand>>,
 }
 
 impl Database {
@@ -72,8 +73,8 @@ impl Database {
         });
 
         Ok(Self {
-            senders: Arc::new(senders),
-            counter: Arc::new(atomic::AtomicUsize::new(0)),
+            senders,
+            counter: AtomicUsize::new(0),
         })
     }
 

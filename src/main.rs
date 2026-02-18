@@ -1,6 +1,10 @@
 use std::{net::Ipv4Addr, sync::Arc};
 
 use forge::prelude::*;
+use mimalloc::MiMalloc;
+
+#[global_allocator]
+static GLOBAL: MiMalloc = MiMalloc;
 
 struct State {
     db: Database,
