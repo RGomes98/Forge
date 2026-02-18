@@ -6,7 +6,7 @@ use forge_http::HttpMethod;
 use forge_utils::{PathMatch, PathTree, Segment};
 
 type Path = &'static str;
-type Routes<T> = HashMap<HttpMethod, PathTree<BoxedHandler<T>>>; // TODO: Add support to dynamic routes (wildcards)
+type Routes<T> = HashMap<HttpMethod, PathTree<BoxedHandler<T>>>;
 
 const ROUTER_RULES: (char, char) = ('/', ':');
 
@@ -103,7 +103,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use forge_http::{HttpMethod, HttpStatus, Request, Response};
+    use forge_http::{HttpMethod, HttpStatus, Response};
     use forge_macros::get;
 
     struct State;
@@ -115,7 +115,7 @@ mod tests {
         let mut router: Router<State> = Router::new();
 
         #[get("/ping")]
-        async fn ping_handler(_: Request<'_>) -> Response<'_> {
+        async fn ping_handler() -> Response<'static> {
             Response::new(HttpStatus::Ok)
         }
 
@@ -133,7 +133,7 @@ mod tests {
         let mut router: Router<State> = Router::new();
 
         #[get("/ping")]
-        async fn ping_handler(_: Request<'_>) -> Response<'_> {
+        async fn ping_handler() -> Response<'static> {
             Response::new(HttpStatus::Ok)
         }
 
@@ -148,7 +148,7 @@ mod tests {
         let mut router: Router<State> = Router::new();
 
         #[get("/data")]
-        async fn data_handler(_: Request<'_>) -> Response<'_> {
+        async fn data_handler() -> Response<'static> {
             Response::new(HttpStatus::Ok)
         }
 
@@ -166,7 +166,7 @@ mod tests {
         let mut router: Router<State> = Router::new();
 
         #[get("/users/:id")]
-        async fn users_handler(_: Request<'_>) -> Response<'_> {
+        async fn users_handler() -> Response<'static> {
             Response::new(HttpStatus::Ok)
         }
 
@@ -185,7 +185,7 @@ mod tests {
         let mut router: Router<State> = Router::new();
 
         #[get("/store/:store_id/customer/:customer_id")]
-        async fn store_handler(_: Request<'_>) -> Response<'_> {
+        async fn store_handler() -> Response<'static> {
             Response::new(HttpStatus::Ok)
         }
 
@@ -206,7 +206,7 @@ mod tests {
         let mut router: Router<State> = Router::new();
 
         #[get("/api/v1/status")]
-        async fn status_handler(_: Request<'_>) -> Response<'_> {
+        async fn status_handler() -> Response<'static> {
             Response::new(HttpStatus::Ok)
         }
 
@@ -230,7 +230,7 @@ mod tests {
         let mut router: Router<State> = Router::new();
 
         #[get("/a/b/c/d")]
-        async fn deep_handler(_: Request<'_>) -> Response<'_> {
+        async fn deep_handler() -> Response<'static> {
             Response::new(HttpStatus::Ok)
         }
 
@@ -248,7 +248,7 @@ mod tests {
         let mut router: Router<State> = Router::new();
 
         #[get("/files/:type/recent")]
-        async fn files_handler(_: Request<'_>) -> Response<'_> {
+        async fn files_handler() -> Response<'static> {
             Response::new(HttpStatus::Ok)
         }
 
@@ -268,7 +268,7 @@ mod tests {
         let mut router: Router<State> = Router::new();
 
         #[get("/duplicate")]
-        async fn duplicate_handler(_: Request<'_>) -> Response<'_> {
+        async fn duplicate_handler() -> Response<'static> {
             Response::new(HttpStatus::Ok)
         }
 
@@ -281,12 +281,12 @@ mod tests {
         let mut router: Router<State> = Router::new();
 
         #[get("/users/all")]
-        async fn users_all_handler(_: Request<'_>) -> Response<'_> {
+        async fn users_all_handler() -> Response<'static> {
             Response::new(HttpStatus::Ok)
         }
 
         #[get("/users/:id")]
-        async fn users_id_handler(_: Request<'_>) -> Response<'_> {
+        async fn users_id_handler() -> Response<'static> {
             Response::new(HttpStatus::Ok)
         }
 
