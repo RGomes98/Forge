@@ -27,11 +27,12 @@ Cada item abaixo corresponde a uma issue do [Forge Backlog](https://github.com/u
 - [ ] **Baseline de Benchmark Reproduzível** — P1 · M (#31)
 - [ ] **PathTree com Backtracking e Detecção de Conflitos** — P1 · L (#32)
 - [ ] **Limites de Request (URI, Headers, Body)** — P1 · M (#33)
-- [ ] **405, `Allow`, OPTIONS Automático e HEAD** — P1 · M (#34)
+- [ ] **405, `Allow`, OPTIONS Automático, HEAD e 501** — P1 · M (#34)
 - [ ] **Semântica de Conexão e Erros Não-Fatais** — P1 · M (#35)
 - [ ] **Resposta em Bytes, `Date`/`Server` e Sanitização de Headers** — P1 · M (#36)
 - [ ] **Chunked Transfer-Encoding e `Expect: 100-continue`** — P2 · M (#37)
 - [ ] **Headers Repetidos** — P2 · S (#38)
+- [ ] **`HttpStatus` e `HttpMethod`: Robustez e Testes** — P3 · S (#103)
 
 ## **Fase 2 — Handlers, State & Extractors**
 
@@ -63,10 +64,12 @@ Cada item abaixo corresponde a uma issue do [Forge Backlog](https://github.com/u
 - [ ] **Integração com State e Múltiplos Bancos** — P1 · M (#57)
 - [ ] **API de Query: `execute`, `FromRow`, Parâmetros Tipados** — P1 · L (#58)
 - [ ] **Bug: Panic em `DbValue::decode_cell` e Tipos Desconhecidos** — P1 · S (#59)
+- [ ] **Parâmetros SQL Tipados: `SqlArg` Aceita Só um Tipo Postgres por Variante** — P1 · S (#104)
 - [ ] **Spike: `tokio-postgres` Nativo no Monoio (Pool por Worker)** — P2 · M (#52)
 - [ ] **`MockDatabase` e Guia "Traga seu Driver"** — P2 · M (#60)
 - [ ] **Guia: Usando `sqlx` (ou Outro Driver tokio-only)** — P2 · S (#61)
 - [ ] **Feature Flags: `database` e `config` Opcionais** — P2 · S (#62)
+- [ ] **Shutdown e Drain do Pool de Banco (sem Vazar Runtime e Threads)** — P2 · M (#105)
 - [ ] **TLS no Banco** — P3 · S (#63)
 - [ ] **Runner de Migrations** — Icebox · L (#64)
 
@@ -133,6 +136,7 @@ Cada item abaixo corresponde a uma issue do [Forge Backlog](https://github.com/u
 - [ ] **Exemplos em `examples/`** — P2 · M (#98)
 - [ ] **Rustdoc da API Pública** — P2 · M (#99)
 - [ ] **Templates e Governança do Repositório** — P2 · S (#100)
+- [ ] **Higiene de Dependências e Manifests do Workspace** — P2 · S (#106)
 - [ ] **Metadados e Processo de Release** — P3 · M (#101)
 
 ---
