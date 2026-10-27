@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1771458591911,
+  "lastUpdate": 1793104227880,
   "repoUrl": "https://github.com/RGomes98/Forge",
   "entries": {
     "Benchmark": [
@@ -405,6 +405,35 @@ window.BENCHMARK_DATA = {
           {
             "name": "API Throughput",
             "value": 152595.67,
+            "unit": "req/s"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "54034976+RGomes98@users.noreply.github.com",
+            "name": "Renan Tavares",
+            "username": "RGomes98"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "281c785caaf85af6773d482cb06a0a22bdff0636",
+          "message": "Merge pull request #102 from RGomes98/docs/roadmap\n\ndocs(roadmap): add phased project roadmap",
+          "timestamp": "2026-10-27T09:28:41-03:00",
+          "tree_id": "69df0deafec785aa6b6a10eb255205280d9b62ce",
+          "url": "https://github.com/RGomes98/Forge/commit/281c785caaf85af6773d482cb06a0a22bdff0636"
+        },
+        "date": 1793104227252,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "API Throughput",
+            "value": 256406.18,
             "unit": "req/s"
           }
         ]
