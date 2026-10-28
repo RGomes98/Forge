@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793190426205,
+  "lastUpdate": 1793190733603,
   "repoUrl": "https://github.com/RGomes98/Forge",
   "entries": {
     "Benchmark": [
@@ -463,6 +463,35 @@ window.BENCHMARK_DATA = {
           {
             "name": "API Throughput",
             "value": 163483.6,
+            "unit": "req/s"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "54034976+RGomes98@users.noreply.github.com",
+            "name": "Renan Tavares",
+            "username": "RGomes98"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e393cbc5b9dd1134d191a7bdd53ede3cef19809f",
+          "message": "Merge pull request #110 from RGomes98/perf/benchmark-baseline\n\nBaseline de Benchmark Reproduzível",
+          "timestamp": "2026-10-28T09:30:21-03:00",
+          "tree_id": "c8e327432e609cffe0970ff97ef7a43a5d46334c",
+          "url": "https://github.com/RGomes98/Forge/commit/e393cbc5b9dd1134d191a7bdd53ede3cef19809f"
+        },
+        "date": 1793190733021,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "API Throughput",
+            "value": 158799.12,
             "unit": "req/s"
           }
         ]
