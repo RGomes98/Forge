@@ -1,0 +1,10 @@
+[package]
+name = "forge-bench-server"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+forge = { path = "../../crates/forge" }
+mimalloc = "0.1.48"
+serde = { version = "1.0.228", features = ["derive"] }

@@ -1,0 +1,15 @@
+# Standalone workspace for the benchmark servers. It is intentionally not part of the main
+# workspace, so the reference server (axum/tokio) never enters the framework's build, CI or
+# dependency audit. See docs/benchmarks.md.
+[workspace]
+resolver = "3"
+members = ["forge-server", "axum-server", "runner"]
+
+# Keep in sync with `[profile.release]` in the root Cargo.toml: both servers must be built
+# exactly like a production Forge binary.
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true
