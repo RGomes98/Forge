@@ -2,10 +2,14 @@
 name = "forge-example"
 version = "0.1.0"
 edition = "2024"
+rust-version.workspace = true
 
 [workspace]
 resolver = "3"
 members = ["crates/forge"]
+
+[workspace.package]
+rust-version = "1.88"
 
 [profile.release]
 opt-level = 3

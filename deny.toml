@@ -1,0 +1,13 @@
+# cargo-deny configuration. CI runs `cargo deny check advisories`.
+# Reference: https://embarkstudios.github.io/cargo-deny/checks/advisories/cfg.html
+
+[graph]
+all-features = true
+
+[advisories]
+ignore = [
+    # `fxhash` is unmaintained, but there is no known vulnerability in it. It only reaches the
+    # build through `monoio` 0.2.4, which is the latest release, so there is no upgrade path yet.
+    # Revisit when monoio drops the dependency.
+    { id = "RUSTSEC-2025-0057", reason = "unmaintained (not vulnerable); transitive via monoio 0.2.4, the latest release" },
+]
