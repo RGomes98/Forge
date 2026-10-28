@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793104227880,
+  "lastUpdate": 1793190426205,
   "repoUrl": "https://github.com/RGomes98/Forge",
   "entries": {
     "Benchmark": [
@@ -434,6 +434,35 @@ window.BENCHMARK_DATA = {
           {
             "name": "API Throughput",
             "value": 256406.18,
+            "unit": "req/s"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "54034976+RGomes98@users.noreply.github.com",
+            "name": "Renan Tavares",
+            "username": "RGomes98"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "be0a1448b4aeb65f36f2883f2018bd6bc763c1ed",
+          "message": "Merge pull request #108 from RGomes98/ci/complete-pipeline\n\nCI Completo",
+          "timestamp": "2026-10-28T09:24:39-03:00",
+          "tree_id": "64bdff1a7f60ab1fe2e6c5e4dc5c6f5127907a99",
+          "url": "https://github.com/RGomes98/Forge/commit/be0a1448b4aeb65f36f2883f2018bd6bc763c1ed"
+        },
+        "date": 1793190425496,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "API Throughput",
+            "value": 163483.6,
             "unit": "req/s"
           }
         ]
