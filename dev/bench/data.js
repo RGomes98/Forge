@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793190733603,
+  "lastUpdate": 1794308804657,
   "repoUrl": "https://github.com/RGomes98/Forge",
   "entries": {
     "Benchmark": [
@@ -492,6 +492,35 @@ window.BENCHMARK_DATA = {
           {
             "name": "API Throughput",
             "value": 158799.12,
+            "unit": "req/s"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "54034976+RGomes98@users.noreply.github.com",
+            "name": "Renan Tavares",
+            "username": "RGomes98"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7bf9480e9c6a15bc9b73130db12213c061ea5fd8",
+          "message": "Merge pull request #109 from RGomes98/dependabot/cargo/cargo-minor-and-patch-394c7dee77\n\nbuild(deps): bump mimalloc from 0.1.48 to 0.1.52 in the cargo-minor-and-patch group across 1 directory",
+          "timestamp": "2026-11-10T08:04:21-03:00",
+          "tree_id": "d1a849badbc4e8af1bc6f16d9060b170bd0f908f",
+          "url": "https://github.com/RGomes98/Forge/commit/7bf9480e9c6a15bc9b73130db12213c061ea5fd8"
+        },
+        "date": 1794308804113,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "API Throughput",
+            "value": 165890.75,
             "unit": "req/s"
           }
         ]
